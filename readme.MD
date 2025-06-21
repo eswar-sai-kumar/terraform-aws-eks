@@ -1,6 +1,6 @@
 # Infrastructure
 
-![alt text](eks-infra.svg)
+
 
 Creating above infrastructure involves lot of steps, as maintained sequence we need to create
 * VPC
