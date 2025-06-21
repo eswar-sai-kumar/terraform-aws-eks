@@ -1,6 +1,6 @@
 # Infrastructure
 
-
+![alt text](k8-infra.drawio.svg)
 
 Creating above infrastructure involves lot of steps, as maintained sequence we need to create
 * VPC
