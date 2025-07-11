@@ -36,4 +36,3 @@ resource "aws_ssm_parameter" "ingress_sg_id" {
   value = module.ingress.sg_id
 }
 
-
