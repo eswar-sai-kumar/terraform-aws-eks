@@ -1,0 +1,33 @@
+name: "Terraform Multi-Layer Deploy"
+
+on:
+  workflow_dispatch: # This enables the manual "Run workflow" button in GitHub
+
+jobs:
+  terraform-deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: 'us-east-1'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Apply All
+        run: |
+          folders=("00-vpc" "10-sg" "20-bastion" "30-db" "40-eks" "50-acm" "60-ingress-alb" "70-ecr")
+
+          for dir in "${folders[@]}"; do
+            echo "--------------------------------------------"
+            echo "Processing layer: $dir"
+            echo "--------------------------------------------"
+            cd $dir
+            terraform init
+            terraform apply -auto-approve
+            cd ..
+          done
