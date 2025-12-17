@@ -1,7 +1,7 @@
 name: "Terraform Multi-Layer Deploy"
 
 on:
-  workflow_dispatch: # This enables the manual "Run workflow" button in GitHub
+  workflow_dispatch: # Keeping it manual as you requested
 
 jobs:
   terraform-deploy:
@@ -17,17 +17,35 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false # Disabling the wrapper often fixes formatting issues in logs
 
       - name: Terraform Apply All
         run: |
+          # Define the folder list
           folders=("00-vpc" "10-sg" "20-bastion" "30-db" "40-eks" "50-acm" "60-ingress-alb" "70-ecr")
 
+          # Get the root directory path
+          ROOT_DIR=$(pwd)
+
           for dir in "${folders[@]}"; do
-            echo "--------------------------------------------"
-            echo "Processing layer: $dir"
-            echo "--------------------------------------------"
-            cd $dir
-            terraform init
-            terraform apply -auto-approve
-            cd ..
+            echo "********************************************"
+            echo " STARTING LAYER: $dir "
+            echo "********************************************"
+            
+            # Navigate into the folder
+            cd "$ROOT_DIR/$dir"
+            
+            # Run commands
+            terraform init -input=false
+            terraform apply -auto-approve -input=false
+            
+            # Check if the last command failed
+            if [ $? -ne 0 ]; then
+              echo "Error: Terraform failed in $dir. Stopping pipeline."
+              exit 1
+            fi
+            
+            # Go back to root for the next loop
+            cd "$ROOT_DIR"
           done
