@@ -1,0 +1,35 @@
+name: "Terraform Multi-Layer Destroy"
+
+on:
+  workflow_dispatch: # Manual trigger only for safety
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: 'us-east-1'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Destroy All
+        run: |
+          # The list is REVERSED to handle dependencies correctly
+          folders=("70-ecr" "60-ingress-alb" "50-acm" "40-eks" "30-db" "20-bastion" "10-sg" "00-vpc")
+
+          for dir in "${folders[@]}"; do
+            echo "--------------------------------------------"
+            echo "DESTROYING layer: $dir"
+            echo "--------------------------------------------"
+            cd $dir
+            terraform init
+            # -destroy flag removes the infrastructure
+            terraform destroy -auto-approve
+            cd ..
+          done
