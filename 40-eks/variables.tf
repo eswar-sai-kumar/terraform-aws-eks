@@ -1,6 +1,6 @@
 variable "common_tags" {
   default = {
-    Project     = "task2-infra"
+    Project     = "expense"
     Environment = "dev"
     Terraform   = "true"
   }
@@ -11,7 +11,7 @@ variable "sg_tags" {
 }
 
 variable "project_name" {
-  default = "task2-infra"
+  default = "expense"
 }
 variable "environment" {
   default = "dev"
