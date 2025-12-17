@@ -1,5 +1,5 @@
 variable "project_name" {
-  default = "task2-infra"
+  default = "expense"
 }
 
 variable "environment" {
